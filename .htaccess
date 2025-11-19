@@ -1,0 +1,30 @@
+# --- TEMPORARY: Disable ModSecurity ---
+<IfModule mod_security.c>
+SecRuleRemoveById 400011
+SecRuleRemoveById 400012
+</IfModule>
+
+# --- Allow SEO and audit crawlers ---
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} (SEOptimer|AhrefsBot|Googlebot|bingbot|SitecheckerBot|GTmetrix) [NC]
+RewriteRule .* - [L]
+</IfModule>
+
+# --- Force HTTPS and www ---
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule ^(.*)$ https://www.ricchhotels.com/$1 [L,R=301]
+
+# --- Redirect any /index or /index.* to root ---
+RewriteCond %{REQUEST_URI} ^/index [NC]
+RewriteRule ^index.*$ / [R=301,L]
+
+# --- Remove trailing slash for non-directories ---
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
+
+# --- Serve .html files without typing .html ---
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [NC,L]
